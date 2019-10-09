@@ -1,0 +1,160 @@
+Example 1 
+
+
+At its most basic a PL/SQL block could read as follows (try it): 
+
+
+
+BEGIN
+  DBMS_OUTPUT.PUT_LINE (‘Hello world.’);
+END;
+
+
+
+
+
+This code uses a predefined function called PUT_LINE that is stored in a package (a library of procedures and functions) called DBMS_OUTPUT.You are only able to use this if you have set the serveroutput variable to ON. 
+
+
+Note that PL/SQL uses a semi-colon (;) at the end of each instruction – including after the END statement.
+ 
+
+
+ 
+
+Example 2 
+
+
+If we also declare a variable, we can use iSQL*Plus & to get user input, and use it in our output as follows: 
+
+
+
+DECLARE
+     my_var  VARCHAR2(30);
+
+BEGIN
+     my_var 	:= 	'&input';
+
+     DBMS_OUTPUT.PUT_LINE ('Hello '|| my_var);
+
+END;
+/ 
+
+
+
+
+
+Notes: 
+
+
+
+
+1. The assignment operator (ie the symbol to assign values) in PL/SQL is a colon and an equals sign together (:=).
+
+2. we have declared my_var as a variable length string of up to 30 characters using the familiar Oracle VARCHAR2(n) data-type. You can use all the Oracle SQL data-types in PL/SQL code.
+
+
+
+
+
+
+
+Example 3 
+
+
+
+
+We can also use a variable to store a value retrieved from the database:
+
+
+
+DECLARE
+     	my_var   NUMBER;
+
+BEGIN
+     	SELECT COUNT(*)
+     	INTO     my_var
+    	FROM     emp;
+
+     	DBMS_OUTPUT.PUT_LINE(‘There are ‘|| my_var ||‘employees’);
+
+END;
+/
+
+
+
+
+
+Note the keyword INTO. Data retrieved from the database in PL/SQL blocks must always be retrieved INTO some variable or set of variables.
+
+
+
+
+Example 4 
+
+
+
+
+Once a value has been retrieved from the database into a variable it can be processed in the same ways as variables in other programming languages. For example, using an IF statement:
+
+
+
+DECLARE
+     my_var  NUMBER;
+
+BEGIN
+     SELECT COUNT(*)
+     INTO     my_var
+     FROM     emp;
+
+     IF my_var > 10 THEN
+            DBMS_OUTPUT.PUT_LINE ('Lots of employees' ||my_var);
+
+     ELSE
+            DBMS_OUTPUT.PUT_LINE('Not many employees' || my_var);
+
+     END IF;
+
+END;
+/
+
+
+
+
+
+Admittedly not a very exciting use of an IF statement – but it illustrates the point. Note the semi-colons as the end of each separate instruction. Without these your code will not run.
+
+
+
+
+Example 5 
+
+
+
+
+The previous examples have not included any error handling, because there was little scope for errors to be generated. However, whenever you want to perform processing based on user input it is essential to include error checking in case of invalid inputfrom the user. Note the EXCEPTION section below.
+
+
+
+DECLARE
+     	user_input_var   customer.custid%TYPE;
+     	area_var         customer.area%TYPE;
+       cust_name_var     customer.name%TYPE;
+
+BEGIN
+     	user_input_var := &customer_id;
+
+     	SELECT       	area, name
+     	INTO           area_var, cust_name_var
+     	FROM          	customer
+     	WHERE       	custid = user_input_var;
+
+	DBMS_OUTPUT.PUT_LINE('Customer  '|| cust_name_var || ' lives in ' || area_var);
+
+EXCEPTION
+	WHEN  NO_DATA_FOUND THEN
+
+	              DBMS_OUTPUT.PUT_LINE('This is not a known customer ID, please try again');
+
+END;
+
